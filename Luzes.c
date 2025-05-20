@@ -235,13 +235,42 @@ void Matriz_Leds(){
     //Estando no vetor facilita as modificações ao atualizar a matriz
     COR_RGB luzes [] = {{0.0,0.0,0.0},{0.5*intensidades[modo],0.5*intensidades[modo],0.5*intensidades[modo]}}; 
 
+    //Matriz inicial que será modificada 
     Matriz_leds iluminacao = {{apagado,apagado,apagado,apagado,apagado},
-                            {apagado,luzes[estado_luzes], luzes[estado_luzes],luzes[estado_luzes],apagado},
-                            {apagado,luzes[estado_luzes], apagado,luzes[estado_luzes],apagado},
-                            {apagado,luzes[estado_luzes], luzes[estado_luzes],luzes[estado_luzes],apagado},
+                            {apagado,apagado, apagado,apagado,apagado},
+                            {apagado,apagado, apagado,apagado,apagado},
+                            {apagado,apagado, apagado,apagado,apagado},
                             {apagado,apagado,apagado,apagado,apagado}};
-    
-    //Chama a função que ligará os leds definidos na matriz acima
-    ligar_leds(iluminacao);
+
+    //variáveis de controle para o desenho, ao modificá-las é possível aumentar ou diminuir o quadrado da animação
+    uint c=0;                   //Variável para posicionar as colunas
+    uint limite = 4;            //Armazena a posição da coluna mais externa do desenho
+    uint leds_linha = 3;        //Quantidade de passsos para ligar os leds da linha
+    uint primeira_linha = 0;    //posição da primeira linha
+    uint ultima_linha = 4;      //posição da última linha
+
+
+    for(int i = 0; i<5;i++){ //Percorre cada linha
+        for(int j = 0; j< leds_linha; j++){ //Percorre cada coluna - leds_linha é a quantidade q liga em cada linha
+            if(i==primeira_linha || i == ultima_linha){
+                if(j==0){
+                    c = 4/2;    //posiciona no meio da linha
+                    iluminacao[i][c] = luzes[estado_luzes];
+                }else{
+                    iluminacao[i][c+j] = luzes[estado_luzes];     //liga uma posição a mais para a direita
+                    iluminacao[i][c-j] = luzes[estado_luzes];    //liga uma posição a menos para a esquerda
+                };
+                ligar_leds(iluminacao); //Mostra a nova construção
+                sleep_ms(75);
+            }else if (i>primeira_linha && i<ultima_linha){
+                int borda = abs(limite-4);
+                iluminacao[i][limite] = luzes[estado_luzes];    //liga as bordas de cada linha
+                iluminacao[i][borda] = luzes[estado_luzes];
+                break;
+            };
+        };
+        ligar_leds(iluminacao); //Mostra a nova construção
+        sleep_ms(75);
+    };
     
 };
